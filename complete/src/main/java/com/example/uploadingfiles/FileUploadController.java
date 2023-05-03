@@ -64,6 +64,11 @@ public class FileUploadController {
 			RedirectAttributes redirectAttributes) {
 
 		storageService.store(file);
+		try {
+			this.createTagCloud(file.getName(), file);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		redirectAttributes.addFlashAttribute("message",
 				"You successfully uploaded " + file.getOriginalFilename() + "!");
 
@@ -88,7 +93,9 @@ public class FileUploadController {
 		return clouds;
 	}
 
-	private void createTagCloud(String filename, String inhalt) throws IOException {
+	private void createTagCloud(String filename, MultipartFile inhaltMulti) throws IOException {
+		//System.out.println(inhalt.substring(0,10000));
+		String inhalt = new String(inhaltMulti.getBytes());
 		final FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
 		frequencyAnalyzer.setWordFrequenciesToReturn(300);
 		frequencyAnalyzer.setMinWordLength(4);
